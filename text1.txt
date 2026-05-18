@@ -1,10 +1,10 @@
 program test;
 var
-  a, b: integer;
+  a, b: integer;#
   x: real;
-begin
+@begin
   a := 10;
   b := 20;
   x := (a + b) * 2.5;
-  writeln(x)
+  writeln(x); $
 end.
