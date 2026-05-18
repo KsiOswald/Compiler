@@ -8,13 +8,15 @@
         LineNumber = 0;
         CharNumber = 0;
     }
+
     public uint LineNumber
     {
         get 
         {
             return _lineNumber;
         }
-        set {
+        set 
+        {
             _lineNumber = value;
         }
     }

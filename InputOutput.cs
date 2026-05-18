@@ -9,6 +9,7 @@ class InputOutput
     private static char _ch;
     private static TextPosition _positionNow;
     private static List<Err> _err;
+    private static bool _isEof;
 
     private static string _line;
     private static byte _lastInLine;
@@ -50,10 +51,13 @@ class InputOutput
         }
     }
 
-    private static bool _isEof = false;
+
     public static bool IsEof
     {
-        get { return _isEof; }
+        get
+        {
+            return _isEof;
+        }
     }
 
     static public void Init(string inputPath)
@@ -62,6 +66,7 @@ class InputOutput
         {
             return;
         }
+        _isEof = false;
         _positionNow = new TextPosition();
         _file = new StreamReader(inputPath);
         _err = new List<Err>();
@@ -95,10 +100,15 @@ class InputOutput
         {
             ListThisLine();
             if (Err.Count > 0)
+            {
                 ListErrors();
+            }
             ReadNextLine();
-            if (_isEof) return;
-            _positionNow.LineNumber = _positionNow.LineNumber + 1;
+            if (_isEof)
+            {
+                return;
+            }
+            ++_positionNow.LineNumber;
             _positionNow.CharNumber = 0;
         }
         else
@@ -110,6 +120,7 @@ class InputOutput
 
     private static void ListThisLine()
     {
+        _line = "      " + _line;
         Console.WriteLine(_line);
     }
 
@@ -131,7 +142,8 @@ class InputOutput
         _isEof = true;
         _ch = (char)0;
         _file?.Close();
-        Console.WriteLine($"Компиляция завершена: ошибок — {_errCount}!");
+        Console.WriteLine($"Компиляция завершена:" +
+            $" ошибок — {_errCount}!");
     }
 
     static void ListErrors()
@@ -144,15 +156,21 @@ class InputOutput
             s = "**";
             if (_errCount < 10) s += "0";
             s += $"{_errCount}**";
-            while (s.Length - 1 < pos + item.ErrorPosition.CharNumber) s += " ";
+            while (s.Length - 1 < pos + item.ErrorPosition.CharNumber)
+            {
+                s += " ";
+            }
             s += $"^ ошибка код {item.ErrorCode}";
             Console.WriteLine(s);
         }
     }
 
-    static public void Error(byte errorCode, TextPosition position)
+    static public void Error(TextPosition position,  byte errorCode)
     {
-        if (_err == null) return;
+        if (_err == null)
+        {
+            return;
+        }
         if (_err.Count <= ERRMAX)
         {
             _err.Add(new Err(position, errorCode));
