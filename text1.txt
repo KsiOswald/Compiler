@@ -1,0 +1,10 @@
+program test;
+var
+  a, b: integer;
+  x: real;
+begin
+  a := 10;
+  b := 20;
+  x := (a + b) * 2.5;
+  writeln(x)
+end.
