@@ -1,24 +1,29 @@
-﻿internal class Program
+﻿using System;
+using System.IO;
+
+internal class Program
 {
     private static void Main(string[] args)
     {
-        InputOutput.Init("text1.txt");
-        while (!InputOutput.IsEof)
+        const string inputPath = "text1.txt";
+        const string outputPath = "tokens.txt";
+
+        InputOutput.Init(inputPath);
+
+        using (StreamWriter writer = new StreamWriter(outputPath))
         {
-            if (InputOutput.Ch =='$')
+            while (!InputOutput.IsEof)
             {
-                InputOutput.Error(InputOutput.PositionNow, 5);
+                Sym sym = LexicalAnalyzer.NextSym();
+                if (sym == Sym.Unknown) continue;
+
+                writer.Write((byte)sym);
+                writer.Write(' ');
             }
-            if (InputOutput.Ch == '#')
-            {
-                InputOutput.Error(InputOutput.PositionNow, 5);
-            }
-            if (InputOutput.Ch == '@')
-            {
-                InputOutput.Error(InputOutput.PositionNow, 5);
-            }
-            InputOutput.NextCh();
         }
+
+        Console.WriteLine();
+        Console.WriteLine($"Коды лексем записаны в {outputPath}");
         Console.ReadKey();
     }
 }
