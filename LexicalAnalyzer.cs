@@ -5,6 +5,7 @@ class LexicalAnalyzer
     private static Sym _symbol;
     private static TextPosition _token;
     private static string _addrName;
+    private static string _addrString;
     private static int _nmbInt;
     private static float _nmbFloat;
     private static char _oneSymbol;
@@ -32,6 +33,14 @@ class LexicalAnalyzer
             return _addrName;
         }
     }
+    public static string AddrString
+    {
+        get
+        {
+            return _addrString;
+        }
+    }
+
     public static int NmbInt
     {
         get
@@ -156,32 +165,69 @@ class LexicalAnalyzer
             _symbol = Sym.Intc;
             return _symbol;
         }
+        if (ch == '\'')
+        {
+            ReadStringConstant();
+            return _symbol;
+        }
 
         switch (ch)
         {
             case '<':
                 InputOutput.NextCh();
-                if (InputOutput.Ch == '=') { _symbol = Sym.Laterequal; InputOutput.NextCh(); }
-                else if (InputOutput.Ch == '>') { _symbol = Sym.Latergreater; InputOutput.NextCh(); }
-                else { _symbol = Sym.Later; }
+                if (InputOutput.Ch == '=')
+                {
+                    _symbol = Sym.Laterequal;
+                    InputOutput.NextCh();
+                }
+                else if (InputOutput.Ch == '>')
+                {
+                    _symbol = Sym.Latergreater;
+                    InputOutput.NextCh();
+                }
+                else
+                {
+                    _symbol = Sym.Later;
+                }
                 break;
 
             case '>':
                 InputOutput.NextCh();
-                if (InputOutput.Ch == '=') { _symbol = Sym.Greaterequal; InputOutput.NextCh(); }
-                else { _symbol = Sym.Greater; }
+                if (InputOutput.Ch == '=')
+                {
+                    _symbol = Sym.Greaterequal;
+                    InputOutput.NextCh();
+                }
+                else
+                {
+                    _symbol = Sym.Greater;
+                }
                 break;
 
             case ':':
                 InputOutput.NextCh();
-                if (InputOutput.Ch == '=') { _symbol = Sym.Assign; InputOutput.NextCh(); }
-                else { _symbol = Sym.Colon; }
+                if (InputOutput.Ch == '=')
+                {
+                    _symbol = Sym.Assign;
+                    InputOutput.NextCh();
+                }
+                else
+                {
+                    _symbol = Sym.Colon;
+                }
                 break;
 
             case '.':
                 InputOutput.NextCh();
-                if (InputOutput.Ch == '.') { _symbol = Sym.Twopoints; InputOutput.NextCh(); }
-                else { _symbol = Sym.Point; }
+                if (InputOutput.Ch == '.')
+                {
+                    _symbol = Sym.Twopoints;
+                    InputOutput.NextCh();
+                }
+                else
+                {
+                    _symbol = Sym.Point;
+                }
                 break;
 
             case ';': _symbol = Sym.Semicolon; InputOutput.NextCh(); break;
@@ -196,7 +242,6 @@ class LexicalAnalyzer
             case '^': _symbol = Sym.Arrow; InputOutput.NextCh(); break;
 
             default:
-                // Недопустимый символ (код ошибки 5)
                 InputOutput.Error(InputOutput.PositionNow, 5);
                 InputOutput.NextCh();
                 return NextSym();
@@ -212,7 +257,10 @@ class LexicalAnalyzer
         {
             InputOutput.NextCh();
         }
-        if (!InputOutput.IsEof) InputOutput.NextCh();
+        if (!InputOutput.IsEof)
+        {
+            InputOutput.NextCh();
+        }
     }
 
     private static void SkipParenStarComment()
@@ -245,7 +293,55 @@ class LexicalAnalyzer
             InputOutput.NextCh();
         }
     }
+    private static void ReadStringConstant()
+    {
+        uint startLine = _token.LineNumber;
+        InputOutput.NextCh();
+        _addrString = "";
 
+        bool finished = false;
+        bool broken = false;
+
+        while (!finished && !broken && !InputOutput.IsEof)
+        {
+            if (InputOutput.IsEol)
+            {
+                broken = true;
+            }
+            else if (InputOutput.Ch == '\'')
+            {
+                InputOutput.NextCh();
+                if (!InputOutput.IsEof &&
+                    !InputOutput.IsEol &&
+                    InputOutput.Ch == '\'')
+                {
+                    _addrString += '\'';
+                    InputOutput.NextCh();
+                }
+                else
+                {
+                    finished = true;
+                }
+            }
+            else
+            {
+                _addrString += InputOutput.Ch;
+                InputOutput.NextCh();
+            }
+        }
+
+        if (!finished)
+        {
+            InputOutput.Error(_token, 12);
+        }
+
+        if (_addrString.Length == 1)
+        {
+            _oneSymbol = _addrString[0];
+        }
+
+        _symbol = Sym.Stringc;
+    }
     private static bool IsLetter(char c)
     {
         return (c >= 'a' && c <= 'z') ||

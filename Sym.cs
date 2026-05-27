@@ -38,6 +38,7 @@ enum Sym : byte
     Lcomment     = 72,   // (*
     Rcomment     = 73,   // *)
     Twopoints    = 74,   // ..
+    Stringc = 80,
     Floatc       = 82,   // вещественная константа
     Insy         = 100,  // in
     Ofsy         = 101,  // of

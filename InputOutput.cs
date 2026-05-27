@@ -60,6 +60,14 @@ class InputOutput
         }
     }
 
+    public static bool IsEol
+    {
+        get
+        {
+            return _positionNow.CharNumber == _lastInLine;
+        }
+    }
+
     static public void Init(string inputPath)
     {
         if (!File.Exists(inputPath))
@@ -148,7 +156,7 @@ class InputOutput
 
     static void ListErrors()
     {
-        int pos = 6 - $"{PositionNow.LineNumber}".Length;
+        const int pos = 5;
         string s;
         foreach (Err item in Err)
         {
@@ -160,7 +168,7 @@ class InputOutput
             {
                 s += " ";
             }
-            s += $"^ ошибка код {item.ErrorCode}";
+            s += $"^ ошибка код {item.ErrorCode}: {ErrorTable.GetMessage(item.ErrorCode)}";
             Console.WriteLine(s);
         }
     }
