@@ -5,21 +5,15 @@ internal class Program
 {
     private static void Main(string[] args)
     {
-        const string inputPath = "text1.txt";
+        const string inputPath = "text4.txt";
         const string outputPath = "tokens.txt";
 
         InputOutput.Init(inputPath);
 
         using (StreamWriter writer = new StreamWriter(outputPath))
         {
-            while (!InputOutput.IsEof)
-            {
-                Sym sym = LexicalAnalyzer.NextSym();
-                if (sym == Sym.Unknown) continue;
-
-                writer.Write((byte)sym);
-                writer.Write(' ');
-            }
+            Parser parser = new Parser(writer);
+            parser.Parse();
         }
 
         Console.WriteLine();

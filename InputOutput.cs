@@ -4,7 +4,7 @@ using System.IO;
 
 class InputOutput
 {
-    const byte ERRMAX = 9;
+    const byte ERRMAX = 20;
 
     private static char _ch;
     private static TextPosition _positionNow;
@@ -162,7 +162,10 @@ class InputOutput
         {
             ++_errCount;
             s = "**";
-            if (_errCount < 10) s += "0";
+            if (_errCount < 10)
+            {
+                s += "0";
+            }
             s += $"{_errCount}**";
             while (s.Length - 1 < pos + item.ErrorPosition.CharNumber)
             {

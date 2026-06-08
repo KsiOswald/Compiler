@@ -74,7 +74,10 @@ class LexicalAnalyzer
                 InputOutput.NextCh();
             }
 
-            if (InputOutput.IsEof) break;
+            if (InputOutput.IsEof)
+            {
+                break;
+            }
 
             if (InputOutput.Ch == '{')
             {
@@ -140,7 +143,7 @@ class LexicalAnalyzer
 
         if (IsDigit(ch))
         {
-            int maxInt = int.MaxValue;
+            int maxInt = short.MaxValue;
             _nmbInt = 0;
             bool overflow = false;
             while (IsDigit(InputOutput.Ch))
@@ -260,6 +263,10 @@ class LexicalAnalyzer
         if (!InputOutput.IsEof)
         {
             InputOutput.NextCh();
+        }
+        else
+        {
+            InputOutput.Error(InputOutput.PositionNow, 20);
         }
     }
 
